@@ -10,18 +10,18 @@ src = ( file ) ->
     "fixtures/#{file}.src"), encoding : "utf8"
 
 
-describe "AST", ->
+describe 'AST', ->
 
   fsm = undefined
   before ->
-    fsm = parser src "vending"
+    fsm = parser src 'vending'
     console.log fsm.toString()
 
-  it "Top level item is 'FSM'", ( done ) ->
-    fsm.type.should.equal "FSM"
+  it 'Top level item is \'FSM\'', ( done ) ->
+    fsm.type.should.equal 'FSM'
     done()
 
-  it "findByType", ( done ) ->
+  it 'findByType', ( done ) ->
     nodes = {}
     for type in [ 'state', 'input', 'output' ]
       nodes[ "#{type}s" ] = fsm.findUniqByType _.capitalize(type)
@@ -29,5 +29,6 @@ describe "AST", ->
     nodes.states.length.should.equal 7
     nodes.inputs.length.should.equal 3
     nodes.outputs.length.should.equal 6
+    console.log fsm.cache().stats()
     done()
 

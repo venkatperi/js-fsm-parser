@@ -1,4 +1,5 @@
 _ = require 'lodash'
+guavaCache = require 'guava-cache'
 
 name = ( x ) -> x.id.name
 
@@ -12,8 +13,12 @@ _visit = ( @node, @depth, visitor ) ->
   new NodeVisitor @node, @depth
   .visit visitor
 
-module.exports = class Node
+nextId = 1
+cache = guavaCache()
+
+class Node
   constructor : ( node, @parent ) ->
+    @id = nextId++
     @type = node.type
     @children = node.children or []
     for attr in @children ? [] when node[ attr ]
@@ -25,11 +30,13 @@ module.exports = class Node
       else
         @[ attr ] = val
 
+  cache: -> cache
+    
   scalars : =>
     items = []
     for attr in @children when @[ attr ]
       val = @[ attr ]
-      items.push attr if !(_.isArray(val) or _.isObject(val))
+      items.push attr if !(_.isArray(val) or val instanceof Node)
     items
 
   walk : ( visitor, depth = 0 ) =>
@@ -61,8 +68,10 @@ module.exports = class Node
     items
 
   findByType : ( type ) =>
-    @filter ( node ) -> node.type is type
+    f = => @filter ( node ) -> node.type is type
+    cache.get "#{@id}:findByType:#{type}", f
 
   findUniqByType : ( type, criterion = name ) =>
     _.uniqBy @findByType(type), criterion
- 
+
+module.exports = Node

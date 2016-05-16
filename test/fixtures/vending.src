@@ -1,5 +1,7 @@
 initial {
-  state: 0;
+  state: 0,
+  nickle: false,
+  dime: false
 }
 
 transitions {

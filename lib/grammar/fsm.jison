@@ -14,8 +14,9 @@ var list = actions.list;
 \s+                   /* skip whitespace */
 "initial"             return 'INITIAL'
 "transitions"         return 'TRANSITIONS'
-"state"               return 'STATE'
 "outputs"             return 'OUTPUTS'
+"true"                return 'TRUE'
+"false"               return 'FALSE'
 [a-zA-Z0-9_]+\b       return 'ID'
 "{"                   return 'LBRACE'
 "}"                   return 'RBRACE'
@@ -47,25 +48,20 @@ expressions
     ;
 
 initial
-    : INITIAL LBRACE initl RBRACE
-        { $$ = $initl; }
+    : INITIAL LBRACE initExpList RBRACE
+        { $$ = $initExpList; }
     ;
 
-initl
-    : init SEMICOLON initl
-        { $$ = child($initl, $init); }
-    | init SEMICOLON
-        { $$ = list($init); }
+initExpList
+    : initExp COMMA initExpList
+        { $$ = child($initExpList, $initExp); }
+    | initExp
+        { $$ = list($initExp); }
     ;
 
-init
-    : init_state
-        { $$ = node('InitExpr', {expr: $1}); }
-    ;
-
-init_state
-    : STATE COLON id
-        { $$ = node('InitialState', {id: $id}); }
+initExp
+    : id COLON idOrLiteral
+        { $$ = node('InitExpr', {name: $id, value: $idOrLiteral}); }
     ;
 
 outputs
@@ -148,6 +144,18 @@ in
         { $$ = option($in, 'invert', 'true'); }
     | id
         { $$ = node('Input', {id: $id}); }
+    ;
+
+idOrLiteral
+    : id
+    | literal
+    ;
+
+literal
+    : TRUE
+        { $$ = node('Literal', {value: 'true'}); }
+    | FALSE
+        { $$ = node('Literal', {value: 'false'}); }
     ;
 
 id
