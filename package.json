@@ -11,6 +11,7 @@
     "error": "^7.0.2",
     "flatten": "^1.0.2",
     "lodash": "^4.12.0",
+    "node-cache": "^3.2.1",
     "prop-it": "^0.2.1"
   },
   "bundleDependencies": [],
@@ -25,6 +26,7 @@
     "grunt-coffeelint": "0.0.15",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-coffee": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-exec": "^0.4.6",
     "grunt-istanbul": "^0.7.0",

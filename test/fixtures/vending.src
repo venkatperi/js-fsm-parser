@@ -1,3 +1,7 @@
+initial {
+  state: 0;
+}
+
 transitions {
   0, 20  -> 5  : nickle;
   0, 20  -> 10 : dime;    //test

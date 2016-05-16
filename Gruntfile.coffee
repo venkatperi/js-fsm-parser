@@ -29,6 +29,11 @@ config = ( grunt ) ->
       jison :
         options :
           create : [ jisonOutDir('lib/grammar/fsm') ]
+  
+    copy:
+      jison:
+        src: 'dist/lib/grammar/fsm.js'
+        dest: 'lib/grammar/fsm.js'
 
     exec :
       jison : { cmd : jisonCmd 'lib/grammar/fsm' }
@@ -39,7 +44,7 @@ config = ( grunt ) ->
   register :
     coverage : [ 'exec:istanbul', 'exec:open_coverage' ]
     test : [ 'exec:mocha', 'coverage' ]
-    jison : [ 'mkdir:jison', 'exec:jison' ]
+    jison : [ 'mkdir:jison', 'exec:jison', 'copy:jison' ]
     default : [ 'coffeelint', 'clean:dist', 'coffee:dist', 'jison' ]
 
 doConfig = ( cfg ) -> ( grunt ) ->

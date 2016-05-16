@@ -1,9 +1,9 @@
 _ = require 'lodash'
-flatten = require './util/flatten'
+
+name = ( x ) -> x.id.name
 
 class NodeVisitor
   constructor : ( @node, @depth ) ->
-  isRoot : => @depth is 0
   visit : ( visitor ) =>
     visitor.call @, @node
     @
@@ -32,13 +32,6 @@ module.exports = class Node
       items.push attr if !(_.isArray(val) or _.isObject(val))
     items
 
-  childNodes : =>
-    items = []
-    for attr in @children when @[ attr ]
-      for child in flatten [ @[ attr ] ]
-        items.push child if child instanceof Node
-    items
-
   walk : ( visitor, depth = 0 ) =>
     _visit(@, depth, visitor)
     for attr in @children when @[ attr ]
@@ -51,7 +44,9 @@ module.exports = class Node
 
   _toString : =>
     str = ("#{attr}: #{@[ attr ]}" for attr in @scalars()).join ', '
-    [ "#{@type}", str ].join (' ')
+    prefix = [ "#{@type} (", @children.join(','), ')' ].join ('')
+
+    [ "#{prefix}", str ].join (' ')
 
   toString : () =>
     lines = []
@@ -65,10 +60,9 @@ module.exports = class Node
       items.push node if fn node
     items
 
-  each : ( fn ) =>
-    @walk ( node ) -> fn node
-
   findByType : ( type ) =>
     @filter ( node ) -> node.type is type
-      
-   
+
+  findUniqByType : ( type, criterion = name ) =>
+    _.uniqBy @findByType(type), criterion
+ 

@@ -1,33 +1,9 @@
 %{
-    hasProp = {}.hasOwnProperty;
-
-    function child(node, child) {
-      list = node[node.children[0]];
-      list.splice(0, 0, child);
-      return node;
-    }
-
-    function option(node, name, value) {
-      node[name] = value;
-      node.children.push(name);
-      return node;
-    }
-
-    function node(type, children) {
-      var names = [];
-      var v;
-      obj = { type: type, children: [] };
-
-      for (name in children) {
-        if (!hasProp.call(children, name)) continue;
-        v = children[name];
-        obj.children.push(name);
-        obj[name] = v;
-      }
-
-      return obj;
-    }
-
+var actions = require('./fsmActions');
+var child = actions.child;
+var node = actions.node;
+var option = actions.option;
+var list = actions.list;
 %}
 
 /* FSM: lexical grammar */
@@ -36,7 +12,9 @@
 
 "//".*                /* ignore comment */
 \s+                   /* skip whitespace */
+"initial"             return 'INITIAL'
 "transitions"         return 'TRANSITIONS'
+"state"               return 'STATE'
 "outputs"             return 'OUTPUTS'
 [a-zA-Z0-9_]+\b       return 'ID'
 "{"                   return 'LBRACE'
@@ -64,94 +42,115 @@
 %% /* language grammar */
 
 expressions
-    : transitions outputs EOF
-        { $$ = node('FSM', {transitions: $1, outputs: $2}); return $$; }
+    : initial transitions outputs EOF
+        { $$ = node('FSM', {initial: $initial, transitions: $transitions, outputs: $outputs}); return $$; }
+    ;
+
+initial
+    : INITIAL LBRACE initl RBRACE
+        { $$ = $initl; }
+    ;
+
+initl
+    : init SEMICOLON initl
+        { $$ = child($initl, $init); }
+    | init SEMICOLON
+        { $$ = list($init); }
+    ;
+
+init
+    : init_state
+        { $$ = node('InitExpr', {expr: $1}); }
+    ;
+
+init_state
+    : STATE COLON id
+        { $$ = node('InitialState', {id: $id}); }
     ;
 
 outputs
     : OUTPUTS LBRACE sol RBRACE
-        {$$ = $3;}
+        { $$ = $sol; }
     ;
 
 sol
     : so SEMICOLON sol
-        {$$ = child($3, $1);}
+        { $$ = child($sol, $so); }
     | so SEMICOLON
-        {$$ = node('OutputList', {outputs: [$1]});}
+        { $$ = list($so); }
     ;
 
 so
     : mod_stl COLON outl
-        {$$ = node('StateOutput', {states: $1, outputs: $3});}
+        { $$ = node('StateOutput', {states: $mod_stl, outputs: $outl}); }
     ;
 
 transitions
     : TRANSITIONS LBRACE trl RBRACE
-        {$$ = $3;}
+        { $$ = $trl; }
     ;
 
 trl
     : tr SEMICOLON trl
-        {$$ = child($3, $1);}
+        { $$ = child($trl, $tr); }
     | tr SEMICOLON
-        {$$ = node('TransitionList', {transitions: [$1]});}
+        { $$ = list($tr); }
     ;
 
 tr
     : stl ARROW st COLON inl
-        {$$ = node('Transition', {from: $1, to: $3, inputs: $5});}
+        { $$ = node('Transition', {from: $stl, to: $st, inputs: $inl}); }
     ;
 
 mod_stl
     : BANG stl
-        {$$ = option($2, 'invert', 'true');}
+        { $$ = option($stl, 'invert', 'true'); }
     | CARET stl
-        {$$ = option($2, 'iff', 'true');}
+        { $$ = option($stl, 'iff', 'true'); }
     | stl
-        {$$ = $1;}
     ;
 
 stl
     : st COMMA stl
-        {$$ = child($3, $1);}
+        { $$ = child($stl, $st); }
     | st
-        {$$ = node('StateList', {states: [$1]});}
+        { $$ = list($st); }
     ;
 
 st
     : id
-        {$$ = node('State', {id: $1});}
+        { $$ = node('State', {id: $id}); }
     ;
 
 outl
     : out COMMA outl
-        {$$ = child($3, $1);}
+        { $$ = child($outl, $out); }
     | out
-        {$$ = node('OutputList', {outputs: [$1]});}
+        { $$ = list($out); }
     ;
 
 out
     : BANG out
-        {$$ = option($2, 'invert', 'true');}
+        { $$ = option($out, 'invert', 'true'); }
     | id
-        {$$ = node('Output', {id: $1});}
+        { $$ = node('Output', {id: $id}); }
     ;
 
 inl
     : in COMMA inl
-        {$$ = child($3, $1);}
+        { $$ = child($inl, $in); }
     | in
-        {$$ = node('InputList', {inputs: [$1]});}
+        { $$ = list($in); }
     ;
 
 in
     : BANG in
-        {$$ = option($2, 'invert', 'true');}
+        { $$ = option($in, 'invert', 'true'); }
     | id
-        {$$ = node('Input', {id: $1});}
+        { $$ = node('Input', {id: $id}); }
     ;
 
 id
     : ID
-        {$$ = node('Id', {name: yytext});}
+        { $$ = node('Id', {name: yytext}); }
     ;
