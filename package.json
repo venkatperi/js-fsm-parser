@@ -1,17 +1,14 @@
 {
-  "name": "js-fsm",
+  "name": "js-fsm-parser",
   "version": "0.6.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/venkatperi/js-fsm.git"
+    "url": "https://github.com/venkatperi/js-fsm-parser.git"
   },
   "preferGlobal": false,
-  "description": "Javascript Moore finite state machine with multiple inputs & outputs",
+  "description": "Parser for js-fsm module",
   "dependencies": {
-    "error": "^7.0.2",
-    "flatten": "^1.0.2",
     "lodash": "^4.12.0",
-    "node-cache": "^3.2.1",
     "prop-it": "^0.2.1"
   },
   "bundleDependencies": [],
@@ -50,6 +47,7 @@
     "signal",
     "state",
     "steady",
-    "transition"
+    "transition",
+    "parser"
   ]
 }
