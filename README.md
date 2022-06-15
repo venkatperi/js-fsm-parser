@@ -36,13 +36,13 @@ Our state machine has states for the each possible deposited amount: 0 for zero 
 fsm = require( 'js-fsm' )
   initial : '0' # starting balance is zero
   transitions : [
-    { from : [ '0', '20' ], to : '5', inputs : 'nickle' }
+    { from : [ '0', '20' ], to : '5', inputs : 'nickel' }
     { from : [ '0', '20' ], to : '10', inputs : 'dime' }
-    { from : [ '5', '25' ], to : '10', inputs : 'nickle' }
+    { from : [ '5', '25' ], to : '10', inputs : 'nickel' }
     { from : [ '5', '25' ], to : '15', inputs : 'dime' }
-    { from : '10', to : '15', inputs : 'nickle' }
+    { from : '10', to : '15', inputs : 'nickel' }
     { from : '10', to : '20', inputs : 'dime' }
-    { from : '15', to : '20', inputs : 'nickle' }
+    { from : '15', to : '20', inputs : 'nickel' }
     { from : '15', to : '25', inputs : 'dime' }
   ]
   outputs :
@@ -57,13 +57,13 @@ fsm = require( 'js-fsm' )
 ```coffeescript
 # from the example
 
-insert 'nickle'
+insert 'nickel'
 insert 'dime'
 insert 'dime'
 insert 'dime'
 insert 'dime'
 insert 'dime'
-insert 'nickle'
+insert 'nickel'
 ```
 
 Output
@@ -71,7 +71,7 @@ Output
 ```
   coin   |  from   |   to    |    5    |   10    |   15    |  candy
  ------- + ------- + ------- + ------- + ------- + ------- + -------
- #nickle |    0    |    5    |    x    |         |         |
+ #nickel |    0    |    5    |    x    |         |         |
  ------- + ------- + ------- + ------- + ------- + ------- + -------
   #dime  |    5    |   15    |         |         |    x    |
  ------- + ------- + ------- + ------- + ------- + ------- + -------
@@ -83,7 +83,7 @@ Output
  ------- + ------- + ------- + ------- + ------- + ------- + -------
   #dime  |   25    |   15    |         |         |    x    |
  ------- + ------- + ------- + ------- + ------- + ------- + -------
- #nickle |   15    |   20    |         |         |         |    x
+ #nickel |   15    |   20    |         |         |         |    x
  ------- + ------- + ------- + ------- + ------- + ------- + -------
 ```
 
